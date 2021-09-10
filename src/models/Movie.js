@@ -29,20 +29,50 @@ const movieSchema = new mongoose.Schema({
     min: 0,
     max: 255,
   },
+  cast: {
+    type: [
+      {
+        actor: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        characters: {
+          type: [String],
+          required: true,
+        },
+      },
+    ],
+    required: true,
+  },
 });
+
+const cast = [
+  {
+    actor: "f8s7ad89fsa13",
+    characters: ["Maria", "Berta"],
+  },
+];
 
 const Movie = mongoose.model("Movie", movieSchema);
 
 const validateMovie = (movie) => {
-  const schema = Joi.object({
+  // TODO: Check whether min(1) is necessary or not
+
+  const castSchema = Joi.object({
+    actor: Joi.objectId().required(),
+    characters: Joi.array().min(1).items(Joi.string()).required(),
+  });
+
+  const movieSchema = Joi.object({
     title: Joi.string().trim().min(3).max(255).required(),
     genreId: Joi.objectId().required(),
     studioId: Joi.objectId().required(),
     releaseDate: Joi.date().required(),
     numberInStock: Joi.number().min(0).required(),
+    cast: Joi.array().min(1).items(castSchema).required(),
   });
 
-  return schema.validate(movie);
+  return movieSchema.validate(movie);
 };
 
 module.exports = {
