@@ -1,5 +1,7 @@
 require("dotenv").config();
 require("./db");
+const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
 const express = require("express");
 const routes = require("./routes");
 

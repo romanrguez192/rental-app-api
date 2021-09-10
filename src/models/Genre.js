@@ -21,7 +21,6 @@ const validateGenre = (genre) => {
 };
 
 module.exports = {
-  genreSchema,
   Genre,
   validate: validateGenre,
 };
