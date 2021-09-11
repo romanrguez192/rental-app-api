@@ -7,6 +7,7 @@ const studioSchema = new mongoose.Schema({
     required: true,
     minlength: 5,
     maxlength: 60,
+    trim: true,
   },
 });
 
@@ -14,7 +15,7 @@ const Studio = mongoose.model("Studio", studioSchema);
 
 const validateStudio = (studio) => {
   const schema = Joi.object({
-    name: Joi.string().min(5).max(50).required(),
+    name: Joi.string().trim().min(5).max(50).required(),
   });
 
   return schema.validate(studio);

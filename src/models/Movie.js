@@ -1,6 +1,18 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
+const castSchema = new mongoose.Schema({
+  actor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Actor",
+    required: true,
+  },
+  characters: {
+    type: [String],
+    required: true,
+  },
+});
+
 const movieSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -30,28 +42,10 @@ const movieSchema = new mongoose.Schema({
     max: 255,
   },
   cast: {
-    type: [
-      {
-        actor: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: true,
-        },
-        characters: {
-          type: [String],
-          required: true,
-        },
-      },
-    ],
+    type: [castSchema],
     required: true,
   },
 });
-
-const cast = [
-  {
-    actor: "f8s7ad89fsa13",
-    characters: ["Maria", "Berta"],
-  },
-];
 
 const Movie = mongoose.model("Movie", movieSchema);
 
