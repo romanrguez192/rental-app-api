@@ -1,7 +1,7 @@
-const winston = require("winston");
+const logger = require("../logger");
 
 const errorHandler = (err, req, res, next) => {
-  winston.error(err.message, err);
+  logger.error(err.message, err);
 
   res.status(500).send("Something failed");
 };

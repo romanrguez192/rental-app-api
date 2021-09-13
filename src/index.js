@@ -1,4 +1,5 @@
 require("dotenv").config();
+const logger = require("./logger");
 require("./db");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
