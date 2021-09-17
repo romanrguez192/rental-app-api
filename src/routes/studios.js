@@ -1,24 +1,22 @@
 const express = require("express");
 const { Studio, validate, validateUpdate } = require("../models/Studio");
 const { User } = require("../models/User");
-const validateId = require("../middlewares/validateObjectId");
+const findStudio = require("../middlewares/findStudio");
+const validateObjectId = require("../middlewares/validateObjectId");
+
+const validateId = validateObjectId("studio");
 const router = express.Router();
 
 // Get all studios
 router.get("/", async (req, res) => {
-  const studios = await Studio.find().select("-__v").sort("name");
+  const studios = await Studio.find().sort("name");
   res.json(studios);
 });
 
 // Get one studio
-router.get("/:id", validateId, async (req, res) => {
-  const studio = await Studio.findById(req.params.id).select("-__v").populate("user", "_id email");
-
-  if (!studio) {
-    return res.status(404).send("The studio with the given ID was not found");
-  }
-
-  res.json(studio);
+router.get("/:id", validateId, findStudio, async (req, res) => {
+  await req.studio.populate("user", "_id email");
+  res.json(req.studio);
 });
 
 // Create a studio
@@ -49,29 +47,21 @@ router.post("/", async (req, res) => {
 });
 
 // Update a studio
-router.put("/:id", validateId, async (req, res) => {
+router.put("/:id", validateId, findStudio, async (req, res) => {
   const { error } = validateUpdate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  const studio = await Studio.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
-
-  if (!studio) {
-    return res.status(404).send("The studio with the given ID was not found");
-  }
+  req.studio.name = req.body.name;
+  await req.studio.save();
 
   res.json(studio);
 });
 
 // Delete a studio
-router.delete("/:id", validateId, async (req, res) => {
-  const studio = await Studio.findByIdAndRemove(req.params.id);
-
-  if (!studio) {
-    return res.status(404).send("The studio with the given ID was not found");
-  }
-
+router.delete("/:id", validateId, findStudio, async (req, res) => {
+  await req.studio.remove();
   res.send("Studio deleted");
 });
 

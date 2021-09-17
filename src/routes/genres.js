@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update a genre
-router.patch("/:id", validateId, findGenre, async (req, res) => {
+router.put("/:id", validateId, findGenre, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
