@@ -1,6 +1,7 @@
 const express = require("express");
 const { Customer, validate, validateUpdate } = require("../models/Customer");
-const validateId = require("../middlewares/validateId");
+const { User } = require("../models/User");
+const validateId = require("../middlewares/validateObjectId");
 const router = express.Router();
 
 // Get all customers
@@ -25,6 +26,11 @@ router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
+  }
+
+  const user = await User.findById(req.body.userId);
+  if (!user) {
+    return res.status(400).send("There is no user with ID " + req.body.userId);
   }
 
   let customer = await Customer.findOne({ user: req.body.user });
@@ -71,7 +77,7 @@ router.delete("/:id", validateId, async (req, res) => {
     return res.status(404).send("The customer with the given ID was not found");
   }
 
-  res.json(customer);
+  res.send("Customer deleted");
 });
 
 module.exports = router;

@@ -1,22 +1,27 @@
 const express = require("express");
 const { Actor, validate } = require("../models/Actor");
-const validateId = require("../middlewares/validateId");
+const validateId = require("../middlewares/validateObjectId");
 const router = express.Router();
+
+// Param middleware
+router.param("id", validateId, async (req, res, next, id) => {
+  const actor = await Actor.findById(id);
+  if (!actor) {
+    return res.status(404).send("The actor with the given ID was not found");
+  }
+
+  res.actor = actor;
+  next();
+});
 
 // Get all actors
 router.get("/", async (req, res) => {
-  const actors = await Actor.find().select("-__v").sort("name");
+  const actors = await Actor.find().sort("name");
   res.json(actors);
 });
 
 // Get one actor
 router.get("/:id", validateId, async (req, res) => {
-  const actor = await Actor.findById(req.params.id).select("-__v");
-
-  if (!actor) {
-    return res.status(404).send("The actor with the given ID was not found");
-  }
-
   res.json(actor);
 });
 
@@ -57,7 +62,7 @@ router.delete("/:id", validateId, async (req, res) => {
     return res.status(404).send("The actor with the given ID was not found");
   }
 
-  res.json(actor);
+  res.send("Actor deleted");
 });
 
 module.exports = router;

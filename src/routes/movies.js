@@ -1,6 +1,8 @@
 const express = require("express");
 const { Movie, validate } = require("../models/Movie");
-const validateId = require("../middlewares/validateId");
+const { Genre } = require("../models/Genre");
+const { Studio } = require("../models/Studio");
+const validateId = require("../middlewares/validateObjectId");
 const router = express.Router();
 
 // Get all movies
@@ -32,10 +34,20 @@ router.post("/", async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
+  const genre = await Genre.findById(req.body.genreId);
+  if (!genre) {
+    return res.status(400).send("There is no genre with ID " + req.body.genreId);
+  }
+
+  const studio = await Studio.findById(req.body.studioId);
+  if (!studio) {
+    return res.status(400).send("There is no studio with ID " + req.body.studioId);
+  }
+
   const movie = new Movie({
     title: req.body.title,
-    genre: req.body.genre,
-    studio: req.body.studio,
+    genre: req.body.genreId,
+    studio: req.body.studioId,
     releaseDate: req.body.releaseDate,
     numberInStock: req.body.numberInStock,
     cast: req.body.cast,
@@ -56,8 +68,8 @@ router.put("/:id", validateId, async (req, res) => {
     req.params.id,
     {
       title: req.body.title,
-      genre: req.body.genre,
-      studio: req.body.studio,
+      genre: req.body.genreId,
+      studio: req.body.studioId,
       releaseDate: req.body.releaseDate,
       numberInStock: req.body.numberInStock,
       cast: req.body.cast,
@@ -80,7 +92,7 @@ router.delete("/:id", validateId, async (req, res) => {
     return res.status(404).send("The movie with the given ID was not found");
   }
 
-  res.json(movie);
+  res.send("Movie deleted");
 });
 
 module.exports = router;

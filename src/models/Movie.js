@@ -52,7 +52,7 @@ const Movie = mongoose.model("Movie", movieSchema);
 const validateMovie = (movie) => {
   // TODO: Check whether min(1) is necessary or not
   const castSchema = Joi.object({
-    actor: Joi.objectId().required(),
+    actorId: Joi.objectId().required(),
     characters: Joi.array().min(1).items(Joi.string()).required(),
   });
 
