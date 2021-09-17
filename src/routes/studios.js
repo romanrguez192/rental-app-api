@@ -32,7 +32,11 @@ router.post("/", async (req, res) => {
     return res.status(400).send("A studio for the given user already exists");
   }
 
-  studio = new Studio({ name: req.body.name });
+  studio = new Studio({
+    name: req.body.name,
+    user: req.body.userId,
+  });
+
   await studio.save();
 
   res.status(201).json(studio);

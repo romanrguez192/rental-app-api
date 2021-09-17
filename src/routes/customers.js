@@ -32,7 +32,12 @@ router.post("/", async (req, res) => {
     return res.status(400).send("A customer for the given user already exists");
   }
 
-  customer = new Customer({ name: req.body.name });
+  customer = new Customer({
+    name: req.body.name,
+    phone: req.body.phone,
+    user: req.body.userId,
+  });
+
   await customer.save();
 
   res.status(201).json(customer);
@@ -45,7 +50,11 @@ router.put("/:id", validateId, async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  const customer = await Customer.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
+  const customer = await Customer.findByIdAndUpdate(
+    req.params.id,
+    { name: req.body.name, phone: req.body.phone },
+    { new: true }
+  );
 
   if (!customer) {
     return res.status(404).send("The customer with the given ID was not found");

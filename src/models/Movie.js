@@ -39,7 +39,7 @@ const movieSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0,
-    max: 255,
+    max: 100000,
   },
   cast: {
     type: [castSchema],
@@ -51,14 +51,13 @@ const Movie = mongoose.model("Movie", movieSchema);
 
 const validateMovie = (movie) => {
   // TODO: Check whether min(1) is necessary or not
-
   const castSchema = Joi.object({
     actor: Joi.objectId().required(),
     characters: Joi.array().min(1).items(Joi.string()).required(),
   });
 
   const movieSchema = Joi.object({
-    title: Joi.string().trim().min(3).max(255).required(),
+    title: Joi.string().trim().min(3).max(100000).required(),
     genreId: Joi.objectId().required(),
     studioId: Joi.objectId().required(),
     releaseDate: Joi.date().required(),
