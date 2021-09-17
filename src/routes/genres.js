@@ -9,8 +9,8 @@ router.get("/", async (req, res) => {
   res.json(genres);
 });
 
-// Get one genres
-router.get("/:id", validateObjectId, async (req, res) => {
+// Get one genre
+router.get("/:id", validateId, async (req, res) => {
   const genre = await Genre.findById(req.params.id).select("-__v");
 
   if (!genre) {

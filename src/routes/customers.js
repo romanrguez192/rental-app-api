@@ -1,63 +1,68 @@
 const express = require("express");
-const { Genre, validate } = require("../models/Genre");
+const { Customer, validate, validateUpdate } = require("../models/Customer");
 const validateId = require("../middlewares/validateId");
 const router = express.Router();
 
-// Get all genres
+// Get all customers
 router.get("/", async (req, res) => {
-  const genres = await Genre.find().select("-__v").sort("name");
-  res.json(genres);
+  const customers = await Customer.find().select("-__v").sort("name");
+  res.json(customers);
 });
 
-// Get one genres
-router.get("/:id", validateObjectId, async (req, res) => {
-  const genre = await Genre.findById(req.params.id).select("-__v");
+// Get one customer
+router.get("/:id", validateId, async (req, res) => {
+  const customer = await Customer.findById(req.params.id).select("-__v").populate("user", "_id email");
 
-  if (!genre) {
-    return res.status(404).send("The genre with the given ID was not found");
+  if (!customer) {
+    return res.status(404).send("The customer with the given ID was not found");
   }
 
-  res.json(genre);
+  res.json(customer);
 });
 
-// Create a genre
+// Create a customer
 router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  const genre = new Genre({ name: req.body.name });
-  await genre.save();
+  let customer = await Customer.findOne({ user: req.body.user });
+  if (customer) {
+    return res.status(400).send("A customer for the given user already exists");
+  }
 
-  res.status(201).json(genre);
+  customer = new Customer({ name: req.body.name });
+  await customer.save();
+
+  res.status(201).json(customer);
 });
 
-// Update a genre
+// Update a customer
 router.put("/:id", validateId, async (req, res) => {
-  const { error } = validate(req.body);
+  const { error } = validateUpdate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  const genre = await Genre.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
+  const customer = await Customer.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
 
-  if (!genre) {
-    return res.status(404).send("The genre with the given ID was not found");
+  if (!customer) {
+    return res.status(404).send("The customer with the given ID was not found");
   }
 
-  res.json(genre);
+  res.json(customer);
 });
 
-// Delete a genre
+// Delete a customer
 router.delete("/:id", validateId, async (req, res) => {
-  const genre = await Genre.findByIdAndRemove(req.params.id);
+  const customer = await Customer.findByIdAndRemove(req.params.id);
 
-  if (!genre) {
-    return res.status(404).send("The genre with the given ID was not found");
+  if (!customer) {
+    return res.status(404).send("The customer with the given ID was not found");
   }
 
-  res.json(genre);
+  res.json(customer);
 });
 
 module.exports = router;

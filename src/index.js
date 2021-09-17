@@ -1,8 +1,7 @@
 require("dotenv").config();
-const logger = require("./logger");
-require("./db");
-const Joi = require("joi");
-Joi.objectId = require("joi-objectid")(Joi);
+const logger = require("./utils/logger");
+require("./config/db");
+require("./config/joi");
 const express = require("express");
 require("express-async-errors");
 const routes = require("./routes");
