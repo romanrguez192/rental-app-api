@@ -1,5 +1,5 @@
 const express = require("express");
-const { Studio, validate, validateUpdate } = require("../models/Studio");
+const { Studio, validate } = require("../models/Studio");
 const { User } = require("../models/User");
 const findStudio = require("../middlewares/findStudio");
 const validateObjectId = require("../middlewares/validateObjectId");
@@ -45,7 +45,7 @@ router.post("/", signup, async (req, res) => {
 
 // Update a studio
 router.put("/:id", auth, validateId, findStudio, async (req, res) => {
-  const { error } = validateUpdate(req.body);
+  const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
@@ -53,7 +53,7 @@ router.put("/:id", auth, validateId, findStudio, async (req, res) => {
   req.studio.name = req.body.name;
   await req.studio.save();
 
-  res.json(studio);
+  res.json(req.studio);
 });
 
 // Delete a studio
