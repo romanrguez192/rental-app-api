@@ -1,13 +1,17 @@
 const express = require("express");
-const { Studio, validate } = require("../models/Studio");
+const { Studio } = require("../models/Studio");
 const { User } = require("../models/User");
-const findStudio = require("../middlewares/findStudio");
+const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const signup = require("../middlewares/signup");
 const isStudio = require("../middlewares/isStudio");
 const checkStudioId = require("../middlewares/checkStudioId");
+const validate = require("../middlewares/validate");
 
+const validateStudio = validate("studio");
+const validateUser = validate("user");
+const findStudio = find("studio");
 const validateId = validateObjectId("studio");
 const router = express.Router();
 
@@ -23,18 +27,10 @@ router.get("/:id", validateId, findStudio, async (req, res) => {
 });
 
 // Create a studio
-router.post("/", signup, async (req, res) => {
-  const { error } = validate(req.body.studio);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.post("/", validateUser, signup, validateStudio, async (req, res) => {
   const user = { _id: req.user._id, email: req.user.email };
 
-  const studio = new Studio({
-    name: req.body.studio.name,
-    user,
-  });
+  const studio = new Studio({ ...req.body.studio, user });
 
   req.user.role = "Studio";
   await req.user.save();
@@ -45,12 +41,7 @@ router.post("/", signup, async (req, res) => {
 });
 
 // Update a studio
-router.put("/:id", auth, isStudio, validateId, checkStudioId, findStudio, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.put("/:id", auth, isStudio, validateId, checkStudioId, findStudio, validateStudio, async (req, res) => {
   req.studio.set(req.body);
   await req.studio.save();
 

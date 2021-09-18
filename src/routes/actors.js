@@ -1,10 +1,13 @@
 const express = require("express");
-const { Actor, validate } = require("../models/Actor");
-const findActor = require("../middlewares/findActor");
+const { Actor } = require("../models/Actor");
+const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const isStudio = require("../middlewares/isStudio");
+const validate = require("../middlewares/validate");
 
+const findActor = find("actor");
+const validateActor = validate("actor");
 const validateId = validateObjectId("actor");
 const router = express.Router();
 
@@ -20,12 +23,7 @@ router.get("/:id", validateId, findActor, async (req, res) => {
 });
 
 // Create an actor
-router.post("/", auth, isStudio, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.post("/", auth, isStudio, validateActor, async (req, res) => {
   const actor = new Actor(req.body);
   await actor.save();
 
@@ -33,12 +31,7 @@ router.post("/", auth, isStudio, async (req, res) => {
 });
 
 // Update an actor
-router.put("/:id", auth, isStudio, validateId, findActor, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.put("/:id", auth, isStudio, validateId, findActor, validateActor, async (req, res) => {
   req.actor.set(req.body);
   await req.actor.save();
 

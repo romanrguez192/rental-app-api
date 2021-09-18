@@ -1,13 +1,17 @@
 const express = require("express");
-const { Customer, validate } = require("../models/Customer");
+const { Customer } = require("../models/Customer");
 const { User } = require("../models/User");
-const findCustomer = require("../middlewares/findCustomer");
+const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const signup = require("../middlewares/signup");
 const isCustomer = require("../middlewares/isCustomer");
 const checkCustomerId = require("../middlewares/checkCustomerId");
+const validate = require("../middlewares/validate");
 
+const validateCustomer = validate("customer");
+const validateUser = validate("user");
+const findCustomer = find("customer");
 const validateId = validateObjectId("customer");
 const router = express.Router();
 
@@ -23,19 +27,10 @@ router.get("/:id", validateId, findCustomer, async (req, res) => {
 });
 
 // Create a customer
-router.post("/", signup, async (req, res) => {
-  const { error } = validate(req.body.customer);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.post("/", validateUser, signup, validateCustomer, async (req, res) => {
   const user = { _id: req.user._id, email: req.user.email };
 
-  const customer = new Customer({
-    name: req.body.customer.name,
-    phone: req.body.customer.phone,
-    user,
-  });
+  const customer = new Customer({ ...req.body.customer, user });
 
   req.user.role = "Customer";
   await req.user.save();
@@ -46,12 +41,7 @@ router.post("/", signup, async (req, res) => {
 });
 
 // Update a customer
-router.put("/:id", auth, isCustomer, validateId, checkCustomerId, findCustomer, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.put("/:id", auth, isCustomer, validateId, checkCustomerId, findCustomer, validateCustomer, async (req, res) => {
   req.customer.set(req.body);
   await req.customer.save();
 

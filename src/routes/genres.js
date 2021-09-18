@@ -1,10 +1,13 @@
 const express = require("express");
-const { Genre, validate } = require("../models/Genre");
-const findGenre = require("../middlewares/findGenre");
+const { Genre } = require("../models/Genre");
+const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const isStudio = require("../middlewares/isStudio");
+const validate = require("../middlewares/validate");
 
+const validateGenre = validate("genre");
+const findGenre = find("genre");
 const validateId = validateObjectId("genre");
 const router = express.Router();
 
@@ -20,12 +23,7 @@ router.get("/:id", validateId, findGenre, async (req, res) => {
 });
 
 // Create a genre
-router.post("/", auth, isStudio, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
+router.post("/", auth, isStudio, validateGenre, async (req, res) => {
   const genre = new Genre(req.body);
   await genre.save();
 
@@ -33,7 +31,7 @@ router.post("/", auth, isStudio, async (req, res) => {
 });
 
 // Update a genre
-router.put("/:id", auth, isStudio, validateId, findGenre, async (req, res) => {
+router.put("/:id", auth, isStudio, validateId, findGenre, validateGenre, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);

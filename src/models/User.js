@@ -35,5 +35,5 @@ const validateUser = (user) => {
 
 module.exports = {
   User,
-  validate: validateUser,
+  validateUser,
 };

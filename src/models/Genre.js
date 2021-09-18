@@ -23,5 +23,5 @@ const validateGenre = (genre) => {
 
 module.exports = {
   Genre,
-  validate: validateGenre,
+  validateGenre,
 };

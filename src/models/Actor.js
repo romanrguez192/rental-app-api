@@ -23,5 +23,5 @@ const validateActor = (actor) => {
 
 module.exports = {
   Actor,
-  validate: validateActor,
+  validateActor,
 };

@@ -37,5 +37,5 @@ const validateStudio = (studio) => {
 
 module.exports = {
   Studio,
-  validate: validateStudio,
+  validateStudio,
 };

@@ -45,5 +45,5 @@ const validateCustomer = (customer) => {
 
 module.exports = {
   Customer,
-  validate: validateCustomer,
+  validateCustomer,
 };

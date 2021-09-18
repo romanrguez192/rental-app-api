@@ -67,7 +67,7 @@ const validateMovie = (movie) => {
 };
 
 // We need a different validate function for updating because it's not allowed to modify the stock of a movie
-const validateUpdate = (movie) => {
+const validateMovieUpdate = (movie) => {
   const movieSchema = Joi.object({
     title: Joi.string().trim().min(3).max(100000).required(),
     genre: Joi.objectId().required(),
@@ -80,6 +80,6 @@ const validateUpdate = (movie) => {
 
 module.exports = {
   Movie,
-  validate: validateMovie,
-  validateUpdate,
+  validateMovie,
+  validateMovieUpdate,
 };
