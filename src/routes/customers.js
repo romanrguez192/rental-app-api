@@ -5,6 +5,8 @@ const findCustomer = require("../middlewares/findCustomer");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const signup = require("../middlewares/signup");
+const isCustomer = require("../middlewares/isCustomer");
+const checkUserId = require("../middlewares/checkUserId");
 
 const validateId = validateObjectId("customer");
 const router = express.Router();
@@ -44,7 +46,7 @@ router.post("/", signup, async (req, res) => {
 });
 
 // Update a customer
-router.put("/:id", auth, validateId, findCustomer, async (req, res) => {
+router.put("/:id", auth, isCustomer, validateId, checkUserId, findCustomer, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -57,7 +59,7 @@ router.put("/:id", auth, validateId, findCustomer, async (req, res) => {
 });
 
 // Delete a customer
-router.delete("/:id", auth, validateId, findCustomer, async (req, res) => {
+router.delete("/:id", auth, isCustomer, validateId, checkUserId, findCustomer, async (req, res) => {
   await req.customer.remove();
   res.send("Customer deleted");
 });
