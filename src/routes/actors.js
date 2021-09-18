@@ -2,6 +2,7 @@ const express = require("express");
 const { Actor, validate } = require("../models/Actor");
 const findActor = require("../middlewares/findActor");
 const validateObjectId = require("../middlewares/validateObjectId");
+const auth = require("../middlewares/auth");
 
 const validateId = validateObjectId("actor");
 const router = express.Router();
@@ -18,7 +19,7 @@ router.get("/:id", validateId, findActor, async (req, res) => {
 });
 
 // Create a actor
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -31,7 +32,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update a actor
-router.put("/:id", validateId, findActor, async (req, res) => {
+router.put("/:id", auth, validateId, findActor, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -44,7 +45,7 @@ router.put("/:id", validateId, findActor, async (req, res) => {
 });
 
 // Delete a actor
-router.delete("/:id", validateId, findActor, async (req, res) => {
+router.delete("/:id", auth, validateId, findActor, async (req, res) => {
   await req.actor.remove();
   res.send("Actor deleted");
 });
