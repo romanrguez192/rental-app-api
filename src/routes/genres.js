@@ -3,6 +3,7 @@ const { Genre, validate } = require("../models/Genre");
 const findGenre = require("../middlewares/findGenre");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
+const isStudio = require("../middlewares/isStudio");
 
 const validateId = validateObjectId("genre");
 const router = express.Router();
@@ -19,7 +20,7 @@ router.get("/:id", validateId, findGenre, async (req, res) => {
 });
 
 // Create a genre
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, isStudio, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -32,7 +33,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 // Update a genre
-router.put("/:id", auth, validateId, findGenre, async (req, res) => {
+router.put("/:id", auth, isStudio, validateId, findGenre, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -45,7 +46,7 @@ router.put("/:id", auth, validateId, findGenre, async (req, res) => {
 });
 
 // Delete a genre
-router.delete("/:id", auth, validateId, findGenre, async (req, res) => {
+router.delete("/:id", auth, isStudio, validateId, findGenre, async (req, res) => {
   await req.genre.remove();
   res.send("Genre deleted");
 });
