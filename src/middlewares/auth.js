@@ -8,8 +8,16 @@ const auth = (req, res, next) => {
 
   try {
     const jwtSecretKey = process.env.TOKEN_SECRET;
-    const user = jwt.verify(token, jwtSecretKey);
-    req.user = user;
+    const payload = jwt.verify(token, jwtSecretKey);
+
+    req.user = { _id: payload.userId, role: payload.role };
+
+    if (req.user.role === "Customer") {
+      req.user.customer = { _id: payload.customerId };
+    } else {
+      req.user.studio = { _id: payload.studioId };
+    }
+
     next();
   } catch (error) {
     res.status(400).send("Invalid token");

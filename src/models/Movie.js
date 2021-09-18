@@ -50,7 +50,25 @@ const movieSchema = new mongoose.Schema({
 const Movie = mongoose.model("Movie", movieSchema);
 
 const validateMovie = (movie) => {
-  // TODO: Check whether min(1) is necessary or not
+  const castSchema = Joi.object({
+    actorId: Joi.objectId().required(),
+    characters: Joi.array().min(1).items(Joi.string().trim().min(2)).required(),
+  });
+
+  const movieSchema = Joi.object({
+    title: Joi.string().trim().min(3).max(100000).required(),
+    genreId: Joi.objectId().required(),
+    releaseDate: Joi.date().min("1900-01-01").required(),
+    numberInStock: Joi.number().min(0).required(),
+    cast: Joi.array().min(1).items(castSchema).required(),
+  });
+
+  return movieSchema.validate(movie);
+};
+
+// We need a different validate function for updating because it's not allowed
+// to modify the studio or stock of a movie
+const validateUpdate = (movie) => {
   const castSchema = Joi.object({
     actorId: Joi.objectId().required(),
     characters: Joi.array().min(1).items(Joi.string()).required(),
@@ -59,9 +77,7 @@ const validateMovie = (movie) => {
   const movieSchema = Joi.object({
     title: Joi.string().trim().min(3).max(100000).required(),
     genreId: Joi.objectId().required(),
-    studioId: Joi.objectId().required(),
     releaseDate: Joi.date().required(),
-    numberInStock: Joi.number().min(0).required(),
     cast: Joi.array().min(1).items(castSchema).required(),
   });
 
@@ -71,4 +87,5 @@ const validateMovie = (movie) => {
 module.exports = {
   Movie,
   validate: validateMovie,
+  validateUpdate,
 };

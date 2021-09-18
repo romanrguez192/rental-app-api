@@ -6,20 +6,19 @@ const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const signup = require("../middlewares/signup");
 const isStudio = require("../middlewares/isStudio");
-const checkUserId = require("../middlewares/checkUserId");
+const checkStudioId = require("../middlewares/checkStudioId");
 
 const validateId = validateObjectId("studio");
 const router = express.Router();
 
 // Get all studios
 router.get("/", async (req, res) => {
-  const studios = await Studio.find().sort("name");
+  const studios = await Studio.find("-user").sort("name");
   res.json(studios);
 });
 
 // Get one studio
 router.get("/:id", validateId, findStudio, async (req, res) => {
-  await req.studio.populate("user", "_id email");
   res.json(req.studio);
 });
 
@@ -46,7 +45,7 @@ router.post("/", signup, async (req, res) => {
 });
 
 // Update a studio
-router.put("/:id", auth, isStudio, validateId, checkUserId, findStudio, async (req, res) => {
+router.put("/:id", auth, isStudio, validateId, checkStudioId, findStudio, async (req, res) => {
   const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -59,7 +58,7 @@ router.put("/:id", auth, isStudio, validateId, checkUserId, findStudio, async (r
 });
 
 // Delete a studio
-router.delete("/:id", auth, isStudio, validateId, checkUserId, findStudio, async (req, res) => {
+router.delete("/:id", auth, isStudio, validateId, checkStudioId, findStudio, async (req, res) => {
   await req.studio.remove();
   res.send("Studio deleted");
 });

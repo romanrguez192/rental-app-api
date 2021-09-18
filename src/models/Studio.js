@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
 
 const studioSchema = new mongoose.Schema({
   name: {
@@ -17,6 +18,12 @@ const studioSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+studioSchema.methods.generateAuthToken = function () {
+  const jwtSecretKey = process.env.TOKEN_SECRET;
+  const token = jwt.sign({ userId: this.user._id, studioId: this._id, role: "Studio" }, jwtSecretKey);
+  return token;
+};
 
 const Studio = mongoose.model("Studio", studioSchema);
 
