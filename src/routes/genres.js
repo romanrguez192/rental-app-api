@@ -26,7 +26,7 @@ router.post("/", auth, isStudio, async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  const genre = new Genre({ name: req.body.name });
+  const genre = new Genre(req.body);
   await genre.save();
 
   res.status(201).json(genre);
@@ -39,7 +39,7 @@ router.put("/:id", auth, isStudio, validateId, findGenre, async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  req.genre.name = req.body.name;
+  req.genre.set(req.body);
   await req.genre.save();
 
   res.json(req.genre);

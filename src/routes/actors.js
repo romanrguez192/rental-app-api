@@ -26,7 +26,7 @@ router.post("/", auth, isStudio, async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  const actor = new Actor({ name: req.body.name });
+  const actor = new Actor(req.body);
   await actor.save();
 
   res.status(201).json(actor);
@@ -39,7 +39,7 @@ router.put("/:id", auth, isStudio, validateId, findActor, async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  req.actor.name = req.body.name;
+  req.actor.set(req.body);
   await req.actor.save();
 
   res.json(req.actor);

@@ -51,7 +51,7 @@ router.put("/:id", auth, isStudio, validateId, checkStudioId, findStudio, async 
     return res.status(400).send(error.details[0].message);
   }
 
-  req.studio.name = req.body.name;
+  req.studio.set(req.body);
   await req.studio.save();
 
   res.json(req.studio);

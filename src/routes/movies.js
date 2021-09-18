@@ -1,7 +1,6 @@
 const express = require("express");
 const { Movie, validate, validateUpdate } = require("../models/Movie");
 const { Genre } = require("../models/Genre");
-const { Studio } = require("../models/Studio");
 const findMovie = require("../middlewares/findMovie");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
@@ -35,14 +34,7 @@ router.post("/", auth, isStudio, async (req, res) => {
     return res.status(400).send("There is no genre with ID " + req.body.genreId);
   }
 
-  const movie = new Movie({
-    title: req.body.title,
-    genre: req.body.genreId,
-    studio: req.user.studio._id,
-    releaseDate: req.body.releaseDate,
-    numberInStock: req.body.numberInStock,
-    cast: req.body.cast.map((a) => ({ actor: a.actorId, characters: a.characters })),
-  });
+  const movie = new Movie({ ...req.body, studio: req.user.studio._id });
   await movie.save();
 
   res.status(201).json(movie);
@@ -60,14 +52,9 @@ router.put("/:id", auth, isStudio, validateId, findMovie, checkMovieStudio, asyn
     return res.status(400).send("There is no genre with ID " + req.body.genreId);
   }
 
-  req.movie.set({
-    title: req.body.title,
-    genre: req.body.genreId,
-    releaseDate: req.body.releaseDate,
-    cast: req.body.cast.map((a) => ({ actor: a.actorId, characters: a.characters })),
-  });
-
+  req.movie.set(req.body);
   await req.movie.save();
+
   res.json(req.movie);
 });
 

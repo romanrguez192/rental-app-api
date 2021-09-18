@@ -52,7 +52,7 @@ router.put("/:id", auth, isCustomer, validateId, checkCustomerId, findCustomer, 
     return res.status(400).send(error.details[0].message);
   }
 
-  req.customer.set({ name: req.body.name, phone: req.body.phone });
+  req.customer.set(req.body);
   await req.customer.save();
 
   res.json(req.customer);
