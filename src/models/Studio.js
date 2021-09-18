@@ -10,10 +10,11 @@ const studioSchema = new mongoose.Schema({
     trim: true,
   },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: {
+      _id: mongoose.Schema.Types.ObjectId,
+      email: String,
+    },
     required: true,
-    unique: true,
   },
 });
 
@@ -22,17 +23,6 @@ const Studio = mongoose.model("Studio", studioSchema);
 const validateStudio = (studio) => {
   const schema = Joi.object({
     name: Joi.string().trim().min(5).max(60).required(),
-    userId: Joi.objectId().required(),
-  });
-
-  return schema.validate(studio);
-};
-
-// We need a different validate function for updating because it's not allowed to modify the user of a studio
-const validateUpdate = (studio) => {
-  const schema = Joi.object({
-    name: Joi.string().trim().min(5).max(60).required(),
-    userId: Joi.objectId().required(),
   });
 
   return schema.validate(studio);
@@ -41,5 +31,4 @@ const validateUpdate = (studio) => {
 module.exports = {
   Studio,
   validate: validateStudio,
-  validateUpdate,
 };

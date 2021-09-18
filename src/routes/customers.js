@@ -1,9 +1,10 @@
 const express = require("express");
-const { Customer, validate, validateUpdate } = require("../models/Customer");
+const { Customer, validate } = require("../models/Customer");
 const { User } = require("../models/User");
 const findCustomer = require("../middlewares/findCustomer");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
+const signup = require("../middlewares/signup");
 
 const validateId = validateObjectId("customer");
 const router = express.Router();
@@ -16,41 +17,35 @@ router.get("/", async (req, res) => {
 
 // Get one customer
 router.get("/:id", validateId, findCustomer, async (req, res) => {
-  await req.customer.populate("user", "_id email");
   res.json(req.customer);
 });
 
 // Create a customer
-router.post("/", auth, async (req, res) => {
-  const { error } = validate(req.body);
+router.post("/", signup, async (req, res) => {
+  const { error } = validate(req.body.customer);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  const user = await User.findById(req.body.userId);
-  if (!user) {
-    return res.status(400).send("There is no user with ID " + req.body.userId);
-  }
+  const user = { _id: req.user._id, email: req.user.email };
 
-  let customer = await Customer.findOne({ user: req.body.user });
-  if (customer) {
-    return res.status(400).send("A customer for the given user already exists");
-  }
-
-  customer = new Customer({
-    name: req.body.name,
-    phone: req.body.phone,
-    user: req.body.userId,
+  const customer = new Customer({
+    name: req.body.customer.name,
+    phone: req.body.customer.phone,
+    user,
   });
 
+  req.user.role = "Customer";
+  await req.user.save();
   await customer.save();
 
-  res.status(201).json(customer);
+  const token = req.user.generateAuthToken();
+  res.header("x-auth-token", token).status(201).json(customer);
 });
 
 // Update a customer
 router.put("/:id", auth, validateId, findCustomer, async (req, res) => {
-  const { error } = validateUpdate(req.body);
+  const { error } = validate(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }

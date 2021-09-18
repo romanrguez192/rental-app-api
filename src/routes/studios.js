@@ -4,6 +4,7 @@ const { User } = require("../models/User");
 const findStudio = require("../middlewares/findStudio");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
+const signup = require("../middlewares/signup");
 
 const validateId = validateObjectId("studio");
 const router = express.Router();
@@ -21,30 +22,25 @@ router.get("/:id", validateId, findStudio, async (req, res) => {
 });
 
 // Create a studio
-router.post("/", auth, async (req, res) => {
-  const { error } = validate(req.body);
+router.post("/", signup, async (req, res) => {
+  const { error } = validate(req.body.studio);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  const user = await User.findById(req.body.userId);
-  if (!user) {
-    return res.status(400).send("There is no user with ID " + req.body.userId);
-  }
+  const user = { _id: req.user._id, email: req.user.email };
 
-  let studio = await Studio.findOne({ user: req.body.user });
-  if (studio) {
-    return res.status(400).send("A studio for the given user already exists");
-  }
-
-  studio = new Studio({
-    name: req.body.name,
-    user: req.body.userId,
+  const studio = new Studio({
+    name: req.body.studio.name,
+    user,
   });
 
+  req.user.role = "Studio";
+  await req.user.save();
   await studio.save();
 
-  res.status(201).json(studio);
+  const token = req.user.generateAuthToken();
+  res.header("x-auth-token", token).status(201).json(studio);
 });
 
 // Update a studio
