@@ -36,7 +36,7 @@ router.post("/", validateUser, signup, validateStudio, async (req, res) => {
   await req.user.save();
   await studio.save();
 
-  const token = req.user.generateAuthToken();
+  const token = studio.generateAuthToken();
   res.header("x-auth-token", token).status(201).json(studio);
 });
 

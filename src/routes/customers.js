@@ -36,7 +36,7 @@ router.post("/", validateUser, signup, validateCustomer, async (req, res) => {
   await req.user.save();
   await customer.save();
 
-  const token = req.user.generateAuthToken();
+  const token = customer.generateAuthToken();
   res.header("x-auth-token", token).status(201).json(customer);
 });
 
