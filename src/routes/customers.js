@@ -17,7 +17,7 @@ const router = express.Router();
 
 // Get all customers
 router.get("/", async (req, res) => {
-  const customers = await Customer.find("-user").sort("name");
+  const customers = await Customer.find().select("-user").sort("name");
   res.json(customers);
 });
 

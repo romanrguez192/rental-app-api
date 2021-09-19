@@ -17,7 +17,7 @@ const router = express.Router();
 
 // Get all studios
 router.get("/", async (req, res) => {
-  const studios = await Studio.find("-user").sort("name");
+  const studios = await Studio.find().select("-user").sort("name");
   res.json(studios);
 });
 
