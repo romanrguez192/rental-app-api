@@ -32,11 +32,6 @@ router.post("/", auth, isStudio, validateGenre, async (req, res) => {
 
 // Update a genre
 router.put("/:id", auth, isStudio, validateId, findGenre, validateGenre, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
-
   req.genre.set(req.body);
   await req.genre.save();
 
