@@ -1,7 +1,3 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-
 require("./utils/logger");
 require("./config/db");
 require("./config/joi");
@@ -31,4 +27,6 @@ app.use(errorHandler);
 const port = config.get("port");
 
 // Server
-app.listen(port, () => console.log(`Server listening on port ${port}...`));
+const server = app.listen(port, () => console.log(`Server listening on port ${port}...`));
+
+module.exports = server;
