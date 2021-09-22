@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
+const config = require("config");
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URL);
+const dbString = config.get("db");
+mongoose.connect(dbString);
 
 const db = mongoose.connection;
 

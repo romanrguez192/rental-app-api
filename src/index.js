@@ -6,6 +6,7 @@ require("./utils/logger");
 require("./config/db");
 require("./config/joi");
 require("express-async-errors");
+const config = require("config");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -27,7 +28,7 @@ app.use("/api", routes);
 app.use(errorHandler);
 
 // Port
-const port = process.env.PORT || 4000;
+const port = config.get("port");
 
 // Server
 app.listen(port, () => console.log(`Server listening on port ${port}...`));

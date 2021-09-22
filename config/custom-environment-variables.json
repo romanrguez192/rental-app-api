@@ -1,0 +1,5 @@
+{
+  "jwtPrivateKey": "TOKEN_SECRET",
+  "db": "MONGODB_URL",
+  "port": "PORT"
+}
