@@ -21,8 +21,8 @@ describe("/api/actors", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2);
-      expect(res.body.some((a) => a.name === "actor1")).toBe(true);
-      expect(res.body.some((a) => a.name === "actor2")).toBe(true);
+      expect(res.body.some((a) => a.name === actors[0].name)).toBe(true);
+      expect(res.body.some((a) => a.name === actors[1].name)).toBe(true);
     });
   });
 
