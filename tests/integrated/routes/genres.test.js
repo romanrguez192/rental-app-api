@@ -1,67 +1,67 @@
 const request = require("supertest");
 const mongoose = require("mongoose");
 const server = require("../../../src/");
-const { Actor } = require("../../../src/models/Actor");
+const { Genre } = require("../../../src/models/Genre");
 const { Studio } = require("../../../src/models/Studio");
 const { Customer } = require("../../../src/models/Customer");
 
-describe("/api/actors", () => {
+describe("/api/genres", () => {
   afterEach(async () => {
     server.close();
-    await Actor.deleteMany();
+    await Genre.deleteMany();
   });
 
   describe("GET /", () => {
-    it("should return all actors", async () => {
-      const actors = [{ name: "actor1" }, { name: "actor2" }];
+    it("should return all genres", async () => {
+      const genres = [{ name: "genre1" }, { name: "genre2" }];
 
-      await Actor.insertMany(actors);
+      await Genre.insertMany(genres);
 
-      const res = await request(server).get("/api/actors");
+      const res = await request(server).get("/api/genres");
 
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2);
-      expect(res.body.some((a) => a.name === "actor1")).toBe(true);
-      expect(res.body.some((a) => a.name === "actor2")).toBe(true);
+      expect(res.body.some((a) => a.name === "genre1")).toBe(true);
+      expect(res.body.some((a) => a.name === "genre2")).toBe(true);
     });
   });
 
   describe("GET /:id", () => {
     it("should return 400 if an invalid id is passed", async () => {
-      const res = await request(server).get("/api/actors/1");
+      const res = await request(server).get("/api/genres/1");
 
       expect(res.status).toBe(400);
     });
 
-    it("should return 404 if no actor with the given id exists", async () => {
+    it("should return 404 if no genre with the given id exists", async () => {
       const id = mongoose.Types.ObjectId();
-      const res = await request(server).get("/api/actors/" + id);
+      const res = await request(server).get("/api/genres/" + id);
 
       expect(res.status).toBe(404);
     });
 
-    it("should return an actor if a valid id is passed and the actor exists", async () => {
-      const actor = new Actor({ name: "actor1" });
-      await actor.save();
+    it("should return a genre if a valid id is passed and the genre exists", async () => {
+      const genre = new Genre({ name: "genre1" });
+      await genre.save();
 
-      const res = await request(server).get("/api/actors/" + actor._id);
+      const res = await request(server).get("/api/genres/" + genre._id);
 
       expect(res.status).toBe(200);
-      expect(res.body).toHaveProperty("name", actor.name);
+      expect(res.body).toHaveProperty("name", genre.name);
     });
   });
 
   describe("POST /", () => {
     let token;
-    let actor;
+    let genre;
 
     const sendRequest = () => {
-      return request(server).post("/api/actors").set("x-auth-token", token).send(actor);
+      return request(server).post("/api/genres").set("x-auth-token", token).send(genre);
     };
 
     beforeEach(() => {
       token = new Studio({ user: {} }).generateAuthToken();
-      actor = { name: "actor" };
+      genre = { name: "genre" };
     });
 
     it("should return 401 if the user is not logged in", async () => {
@@ -86,68 +86,68 @@ describe("/api/actors", () => {
     });
 
     it("should return 400 if the name is missing", async () => {
-      actor.name = undefined;
+      genre.name = undefined;
       const res = await sendRequest();
 
       expect(res.status).toBe(400);
     });
 
-    it("should return 400 if the name has less than 5 characters", async () => {
-      actor.name = "1234";
+    it("should return 400 if the name has less than 3 characters", async () => {
+      genre.name = "12";
       const res = await sendRequest();
 
       expect(res.status).toBe(400);
     });
 
-    it("should return 400 if the name has more than 60 characters", async () => {
-      actor.name = new Array(62).join("a");
+    it("should return 400 if the name has more than 50 characters", async () => {
+      genre.name = new Array(52).join("a");
       const res = await sendRequest();
 
       expect(res.status).toBe(400);
     });
 
-    it("should save the actor if it's valid", async () => {
+    it("should save the genre if it's valid", async () => {
       await sendRequest();
-      const newActor = await Actor.find(actor);
+      const newGenre = await Genre.find(genre);
 
-      expect(newActor).not.toBeNull();
+      expect(newGenre).not.toBeNull();
     });
 
-    it("should return 201 if the actor was created", async () => {
+    it("should return 201 if the genre was created", async () => {
       const res = await sendRequest();
 
       expect(res.status).toBe(201);
     });
 
-    it("should return the actor if it's valid", async () => {
+    it("should return the genre if it's valid", async () => {
       const res = await sendRequest();
 
       expect(res.body).toHaveProperty("_id");
-      expect(res.body).toHaveProperty("name", "actor");
+      expect(res.body).toHaveProperty("name", "genre");
     });
   });
 
   describe("PUT /:id", () => {
     let token;
-    let actor;
+    let genre;
     let id;
 
     const sendRequest = async () => {
       return request(server)
-        .put("/api/actors/" + id)
+        .put("/api/genres/" + id)
         .set("x-auth-token", token)
-        .send(actor);
+        .send(genre);
     };
 
     beforeEach(async () => {
-      // Before each test we need to create a actor and
+      // Before each test we need to create a genre and
       // put it in the database.
-      oldActor = new Actor({ name: "actor" });
-      await oldActor.save();
+      oldGenre = new Genre({ name: "genre" });
+      await oldGenre.save();
 
       token = new Studio({ user: {} }).generateAuthToken();
-      id = oldActor._id;
-      actor = { name: "new name" };
+      id = oldGenre._id;
+      genre = { name: "new name" };
     });
 
     it("should return 401 if the user is not logged in", async () => {
@@ -178,7 +178,7 @@ describe("/api/actors", () => {
       expect(res.status).toBe(400);
     });
 
-    it("should return 404 if the actor with the given id was not found", async () => {
+    it("should return 404 if the genre with the given id was not found", async () => {
       id = mongoose.Types.ObjectId();
       const res = await sendRequest();
 
@@ -186,44 +186,44 @@ describe("/api/actors", () => {
     });
 
     it("should return 400 if the name is missing", async () => {
-      actor.name = undefined;
+      genre.name = undefined;
       const res = await sendRequest();
 
       expect(res.status).toBe(400);
     });
 
-    it("should return 400 if the name has less than 5 characters", async () => {
-      actor.name = "1234";
+    it("should return 400 if the name has less than 3 characters", async () => {
+      genre.name = "12";
       const res = await sendRequest();
 
       expect(res.status).toBe(400);
     });
 
-    it("should return 400 if the name has more than 60 characters", async () => {
-      actor.name = new Array(62).join("a");
+    it("should return 400 if the name has more than 50 characters", async () => {
+      genre.name = new Array(52).join("a");
       const res = await sendRequest();
 
       expect(res.status).toBe(400);
     });
 
-    it("should update the actor if the input is valid", async () => {
+    it("should update the genre if the input is valid", async () => {
       await sendRequest();
-      const updatedActor = await Actor.findById(id);
+      const updatedGenre = await Genre.findById(id);
 
-      expect(updatedActor.name).toBe(actor.name);
+      expect(updatedGenre.name).toBe(genre.name);
     });
 
-    it("should return 200 if the actor was updated", async () => {
+    it("should return 200 if the genre was updated", async () => {
       const res = await sendRequest();
 
       expect(res.status).toBe(200);
     });
 
-    it("should return the updated actor if it's valid", async () => {
+    it("should return the updated genre if it's valid", async () => {
       const res = await sendRequest();
 
       expect(res.body).toHaveProperty("_id");
-      expect(res.body).toHaveProperty("name", actor.name);
+      expect(res.body).toHaveProperty("name", genre.name);
     });
   });
 
@@ -233,18 +233,18 @@ describe("/api/actors", () => {
 
     const sendRequest = async () => {
       return await request(server)
-        .delete("/api/actors/" + id)
+        .delete("/api/genres/" + id)
         .set("x-auth-token", token)
         .send();
     };
 
     beforeEach(async () => {
-      // Before each test we need to create a actor and
+      // Before each test we need to create a genre and
       // put it in the database.
-      const actor = new Actor({ name: "actor" });
-      await actor.save();
+      const genre = new Genre({ name: "genre" });
+      await genre.save();
 
-      id = actor._id;
+      id = genre._id;
       token = new Studio({ user: {} }).generateAuthToken();
     });
 
@@ -276,21 +276,21 @@ describe("/api/actors", () => {
       expect(res.status).toBe(400);
     });
 
-    it("should return 404 if the actor with the given id was not found", async () => {
+    it("should return 404 if the genre with the given id was not found", async () => {
       id = mongoose.Types.ObjectId();
       const res = await sendRequest();
 
       expect(res.status).toBe(404);
     });
 
-    it("should delete the actor if it exists", async () => {
+    it("should delete the genre if it exists", async () => {
       await sendRequest();
-      const actor = await Actor.findById(id);
+      const genre = await Genre.findById(id);
 
-      expect(actor).toBeNull();
+      expect(genre).toBeNull();
     });
 
-    it("should return 200 if the actor was deleted", async () => {
+    it("should return 200 if the genre was deleted", async () => {
       const res = await sendRequest();
 
       expect(res.status).toBe(200);
