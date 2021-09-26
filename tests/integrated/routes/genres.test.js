@@ -4,6 +4,7 @@ const server = require("../../../src/");
 const { Genre } = require("../../../src/models/Genre");
 const { Studio } = require("../../../src/models/Studio");
 const { Customer } = require("../../../src/models/Customer");
+const { Movie } = require("../../../src/models/Movie");
 
 describe("/api/genres", () => {
   afterEach(async () => {
@@ -281,6 +282,24 @@ describe("/api/genres", () => {
       const res = await sendRequest();
 
       expect(res.status).toBe(404);
+    });
+
+    it("should return 400 if a movie has the genre", async () => {
+      const movie = new Movie({
+        title: "movie1",
+        genre: id,
+        studio: mongoose.Types.ObjectId(),
+        releaseDate: new Date("2010-05-05"),
+        numberInStock: 50,
+        cast: [{ actor: mongoose.Types.ObjectId(), characters: ["character1"] }],
+      });
+
+      await movie.save();
+
+      const res = await sendRequest();
+      expect(res.status).toBe(400);
+
+      await movie.remove();
     });
 
     it("should delete the genre if it exists", async () => {

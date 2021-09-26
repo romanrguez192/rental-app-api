@@ -4,6 +4,7 @@ const server = require("../../../src/");
 const { Studio } = require("../../../src/models/Studio");
 const { User } = require("../../../src/models/User");
 const { Customer } = require("../../../src/models/Customer");
+const { Movie } = require("../../../src/models/Movie");
 
 describe("/api/studios", () => {
   afterEach(async () => {
@@ -376,6 +377,24 @@ describe("/api/studios", () => {
       const res = await sendRequest();
 
       expect(res.status).toBe(404);
+    });
+
+    it("should return 400 if the studio has movies", async () => {
+      const movie = new Movie({
+        title: "movie1",
+        genre: mongoose.Types.ObjectId(),
+        studio: id,
+        releaseDate: new Date("2010-05-05"),
+        numberInStock: 50,
+        cast: [{ actor: mongoose.Types.ObjectId(), characters: ["character1"] }],
+      });
+
+      await movie.save();
+
+      const res = await sendRequest();
+      expect(res.status).toBe(400);
+
+      await movie.remove();
     });
 
     it("should delete the studio if it exists", async () => {

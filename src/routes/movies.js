@@ -21,8 +21,9 @@ router.get("/", async (req, res) => {
 
 // Get one movie
 router.get("/:id", validateId, findMovie, async (req, res) => {
-  // TODO: Remove the user object from studio
-  await req.movie.populate(["genre", "studio", "cast.actor"]);
+  await req.movie.populate("genre");
+  await req.movie.populate("studio", "-user");
+  await req.movie.populate("cast.actor");
   res.json(req.movie);
 });
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const { Genre } = require("../models/Genre");
+const { Movie } = require("../models/Movie");
 const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
@@ -40,6 +41,12 @@ router.put("/:id", auth, isStudio, validateId, findGenre, validateGenre, async (
 
 // Delete a genre
 router.delete("/:id", auth, isStudio, validateId, findGenre, async (req, res) => {
+  const canDelete = !(await Movie.findOne({ genre: req.params.id }));
+
+  if (!canDelete) {
+    return res.status(400).send("Cannot delete the genre");
+  }
+
   await req.genre.remove();
   res.send("Genre deleted");
 });

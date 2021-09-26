@@ -4,6 +4,7 @@ const server = require("../../../src/");
 const { Actor } = require("../../../src/models/Actor");
 const { Studio } = require("../../../src/models/Studio");
 const { Customer } = require("../../../src/models/Customer");
+const { Movie } = require("../../../src/models/Movie");
 
 describe("/api/actors", () => {
   afterEach(async () => {
@@ -281,6 +282,24 @@ describe("/api/actors", () => {
       const res = await sendRequest();
 
       expect(res.status).toBe(404);
+    });
+
+    it("should return 400 if the actor appears in a movie", async () => {
+      const movie = new Movie({
+        title: "movie1",
+        genre: mongoose.Types.ObjectId(),
+        studio: mongoose.Types.ObjectId(),
+        releaseDate: new Date("2010-05-05"),
+        numberInStock: 50,
+        cast: [{ actor: id, characters: ["character1"] }],
+      });
+
+      await movie.save();
+
+      const res = await sendRequest();
+      expect(res.status).toBe(400);
+
+      await movie.remove();
     });
 
     it("should delete the actor if it exists", async () => {

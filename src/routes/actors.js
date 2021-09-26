@@ -1,5 +1,6 @@
 const express = require("express");
 const { Actor } = require("../models/Actor");
+const { Movie } = require("../models/Movie");
 const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
@@ -40,6 +41,12 @@ router.put("/:id", auth, isStudio, validateId, findActor, validateActor, async (
 
 // Delete an actor
 router.delete("/:id", auth, isStudio, validateId, findActor, async (req, res) => {
+  const canDelete = !(await Movie.findOne({ "cast.actor": req.params.id }));
+
+  if (!canDelete) {
+    return res.status(400).send("Cannot delete the actor");
+  }
+
   await req.actor.remove();
   res.send("Actor deleted");
 });

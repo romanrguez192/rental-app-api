@@ -1,5 +1,6 @@
 const express = require("express");
 const { Studio } = require("../models/Studio");
+const { Movie } = require("../models/Movie");
 const { User } = require("../models/User");
 const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
@@ -50,6 +51,12 @@ router.put("/:id", auth, isStudio, validateId, checkStudioId, findStudio, valida
 
 // Delete a studio
 router.delete("/:id", auth, isStudio, validateId, checkStudioId, findStudio, async (req, res) => {
+  const canDelete = !(await Movie.findOne({ studio: req.params.id }));
+
+  if (!canDelete) {
+    return res.status(400).send("Cannot delete the studio");
+  }
+
   await req.studio.remove();
   res.send("Studio deleted");
 });

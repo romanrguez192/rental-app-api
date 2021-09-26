@@ -1,5 +1,5 @@
 const express = require("express");
-const { User, validate } = require("../models/User");
+const { User, validateUser } = require("../models/User");
 const { Customer } = require("../models/Customer");
 const { Studio } = require("../models/Studio");
 const bcrypt = require("bcryptjs");
@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { error } = validate(req.body);
+  const { error } = validateUser(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
