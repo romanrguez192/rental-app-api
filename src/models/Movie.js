@@ -56,10 +56,10 @@ const joiCastSchema = Joi.object({
 
 const validateMovie = (movie) => {
   const movieSchema = Joi.object({
-    title: Joi.string().trim().min(3).max(100000).required(),
+    title: Joi.string().trim().min(3).max(255).required(),
     genre: Joi.objectId().required(),
     releaseDate: Joi.date().min("1900-01-01").required(),
-    numberInStock: Joi.number().min(0).required(),
+    numberInStock: Joi.number().min(0).max(100000).required(),
     cast: Joi.array().min(1).items(joiCastSchema).required(),
   });
 
@@ -69,7 +69,7 @@ const validateMovie = (movie) => {
 // We need a different validate function for updating because it's not allowed to modify the stock of a movie
 const validateMovieUpdate = (movie) => {
   const movieSchema = Joi.object({
-    title: Joi.string().trim().min(3).max(100000).required(),
+    title: Joi.string().trim().min(3).max(255).required(),
     genre: Joi.objectId().required(),
     releaseDate: Joi.date().min("1900-01-01").required(),
     cast: Joi.array().min(1).items(joiCastSchema).required(),

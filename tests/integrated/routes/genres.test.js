@@ -108,7 +108,7 @@ describe("/api/genres", () => {
 
     it("should save the genre if it's valid", async () => {
       await sendRequest();
-      const newGenre = await Genre.find(genre);
+      const newGenre = await Genre.findOne(genre);
 
       expect(newGenre).not.toBeNull();
     });

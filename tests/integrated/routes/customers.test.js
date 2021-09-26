@@ -39,8 +39,8 @@ describe("/api/customers", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2);
-      expect(res.body.some((s) => s.name === customers[0].name && s.phone === customers[0].phone)).toBe(true);
-      expect(res.body.some((s) => s.name === customers[1].name && s.phone === customers[1].phone)).toBe(true);
+      expect(res.body.some((c) => c.name === customers[0].name && c.phone === customers[0].phone)).toBe(true);
+      expect(res.body.some((c) => c.name === customers[1].name && c.phone === customers[1].phone)).toBe(true);
     });
   });
 
@@ -186,14 +186,14 @@ describe("/api/customers", () => {
 
     it("should save the user if it's valid", async () => {
       await sendRequest();
-      const user = await User.find({ email: body.user.email });
+      const user = await User.findOne({ email: body.user.email });
 
       expect(user).not.toBeNull();
     });
 
     it("should save the customer if it's valid", async () => {
       await sendRequest();
-      const customer = await Customer.find(body.customer);
+      const customer = await Customer.findOne(body.customer);
 
       expect(customer).not.toBeNull();
     });

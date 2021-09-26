@@ -108,7 +108,7 @@ describe("/api/actors", () => {
 
     it("should save the actor if it's valid", async () => {
       await sendRequest();
-      const newActor = await Actor.find(actor);
+      const newActor = await Actor.findOne(actor);
 
       expect(newActor).not.toBeNull();
     });

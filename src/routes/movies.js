@@ -15,21 +15,22 @@ const router = express.Router();
 
 // Get all movies
 router.get("/", async (req, res) => {
-  const movies = await Movie.find().sort("title").populate("genre").populate("studio", "-user");
+  const movies = await Movie.find().select("-cast").sort("title").populate("genre").populate("studio", "-user");
   res.json(movies);
 });
 
 // Get one movie
 router.get("/:id", validateId, findMovie, async (req, res) => {
+  // TODO: Remove the user object from studio
   await req.movie.populate(["genre", "studio", "cast.actor"]);
   res.json(req.movie);
 });
 
 // Create a movie
 router.post("/", auth, isStudio, validateMovie, async (req, res) => {
-  const genre = await Genre.findById(req.body.genreId);
+  const genre = await Genre.findById(req.body.genre);
   if (!genre) {
-    return res.status(400).send("There is no genre with ID " + req.body.genreId);
+    return res.status(400).send("There is no genre with ID " + req.body.genre);
   }
 
   const movie = new Movie({ ...req.body, studio: req.user.studio._id });
@@ -40,9 +41,9 @@ router.post("/", auth, isStudio, validateMovie, async (req, res) => {
 
 // Update a movie
 router.put("/:id", auth, isStudio, validateId, findMovie, checkMovieStudio, validateMovie, async (req, res) => {
-  const genre = await Genre.findById(req.body.genreId);
+  const genre = await Genre.findById(req.body.genre);
   if (!genre) {
-    return res.status(400).send("There is no genre with ID " + req.body.genreId);
+    return res.status(400).send("There is no genre with ID " + req.body.genre);
   }
 
   req.movie.set(req.body);

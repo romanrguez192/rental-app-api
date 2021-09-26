@@ -160,14 +160,14 @@ describe("/api/studios", () => {
 
     it("should save the user if it's valid", async () => {
       await sendRequest();
-      const user = await User.find({ email: body.user.email });
+      const user = await User.findOne({ email: body.user.email });
 
       expect(user).not.toBeNull();
     });
 
     it("should save the studio if it's valid", async () => {
       await sendRequest();
-      const studio = await Studio.find(body.studio);
+      const studio = await Studio.findOne(body.studio);
 
       expect(studio).not.toBeNull();
     });
