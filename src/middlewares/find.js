@@ -3,6 +3,7 @@ const { Customer } = require("../models/Customer");
 const { Genre } = require("../models/Genre");
 const { Movie } = require("../models/Movie");
 const { Studio } = require("../models/Studio");
+const { Rental } = require("../models/Rental");
 
 const models = {
   actor: Actor,
@@ -10,6 +11,7 @@ const models = {
   genre: Genre,
   movie: Movie,
   studio: Studio,
+  rental: Rental,
 };
 
 const find = (model) => async (req, res, next) => {

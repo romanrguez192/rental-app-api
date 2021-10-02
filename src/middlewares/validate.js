@@ -3,6 +3,7 @@ const { validateCustomer } = require("../models/Customer");
 const { validateGenre } = require("../models/Genre");
 const { validateMovie, validateMovieUpdate } = require("../models/Movie");
 const { validateStudio } = require("../models/Studio");
+const { validateRental } = require("../models/Rental");
 const { validateUser } = require("../models/User");
 
 const validators = {
@@ -12,6 +13,7 @@ const validators = {
     genre: validateGenre,
     movie: validateMovie,
     studio: validateStudio,
+    rental: validateRental,
     user: validateUser,
   },
   update: {
