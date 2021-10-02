@@ -23,6 +23,7 @@ router.get("/:id", validateId, findRental, async (req, res) => {
 });
 
 // Create a rental
+// TODO: Decrement movie stock and check if it's greater than 0
 router.post("/", auth, isCustomer, validateRental, async (req, res) => {
   const rental = new Rental(req.body);
   await rental.save();

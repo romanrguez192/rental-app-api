@@ -19,7 +19,7 @@ router.post("/:id", auth, isCustomer, validateId, findRental, async (req, res) =
   rental.returnDate = new Date();
   await rental.save();
 
-  await Movie.updateOne({ _id: rental.movie }, { $inc: { numberInStock: -1 } });
+  await Movie.updateOne({ _id: rental.movie }, { $inc: { numberInStock: 1 } });
 
   res.json(rental);
 });
