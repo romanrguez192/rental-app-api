@@ -1,6 +1,5 @@
 const express = require("express");
 const { Rental } = require("../models/Rental");
-const { Customer } = require("../models/Customer");
 const { Movie } = require("../models/Movie");
 const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
@@ -22,7 +21,7 @@ router.get("/", auth, isCustomer, async (req, res) => {
 
 // Get one rental
 router.get("/:id", auth, isCustomer, validateId, findRental, checkRentalCustomer, async (req, res) => {
-  await rental.populate("movie");
+  await req.rental.populate("movie");
   res.json(req.rental);
 });
 
