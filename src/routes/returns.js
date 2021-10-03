@@ -1,21 +1,23 @@
 const express = require("express");
-const { Rental } = require("../models/Rental");
 const { Movie } = require("../models/Movie");
 const find = require("../middlewares/find");
 const validateObjectId = require("../middlewares/validateObjectId");
 const auth = require("../middlewares/auth");
 const isCustomer = require("../middlewares/isCustomer");
-const validate = require("../middlewares/validate");
+const checkRentalCustomer = require("../middlewares/checkRentalCustomer");
 
-const validateRental = validate("rental");
 const findRental = find("rental");
 const validateId = validateObjectId("rental");
 const router = express.Router();
 
 // Return a movie
-// TODO: Validate ownership
-router.post("/:id", auth, isCustomer, validateId, findRental, async (req, res) => {
+router.post("/:id", auth, isCustomer, validateId, findRental, checkRentalCustomer, async (req, res) => {
   const rental = req.rental;
+
+  if (rental.returnDate) {
+    return res.status(400).send("Movie already returned");
+  }
+
   rental.returnDate = new Date();
   await rental.save();
 

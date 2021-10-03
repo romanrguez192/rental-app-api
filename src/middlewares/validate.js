@@ -22,7 +22,6 @@ const validators = {
     genre: validateGenre,
     movie: validateMovieUpdate,
     studio: validateStudio,
-    user: validateUser,
   },
 };
 

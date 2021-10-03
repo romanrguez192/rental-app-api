@@ -26,7 +26,6 @@ const Rental = mongoose.model("Rental", rentalSchema);
 
 function validateRental(rental) {
   const schema = Joi.object({
-    customer: Joi.objectId().required(),
     movie: Joi.objectId().required(),
   });
 
@@ -35,5 +34,5 @@ function validateRental(rental) {
 
 module.exports = {
   Rental,
-  validate: validateRental,
+  validateRental,
 };
