@@ -14,86 +14,111 @@ describe("/api/auth", () => {
     await Studio.deleteMany();
   });
 
-  let body;
+  let customerBody;
+  let studioBody;
 
-  const sendRequest = () => {
-    return request(server).post("/api/auth").send(body);
+  const jwtSecretKey = config.get("jwtSecretKey");
+
+  const sendRequestAsCustomer = () => {
+    return request(server).post("/api/auth").send(customerBody);
+  };
+
+  const sendRequestAsStudio = () => {
+    return request(server).post("/api/auth").send(studioBody);
   };
 
   beforeEach(async () => {
-    const storedUser = new User({
-      email: "email@mail.com",
-      password: "123456",
-      role: "Studio",
-    });
-
-    const customer = new Customer({
-      name: "customer",
-      phone: "1234567890",
-      user: {
-        _id: storedUser._id,
-        email: storedUser.email,
+    const studioUser = {
+      studio: {
+        name: "studio",
       },
-    });
-
-    const studio = new Studio({
-      name: "studio",
       user: {
-        _id: storedUser._id,
-        email: storedUser.email,
+        email: "studio@mail.com",
+        password: "123456",
       },
-    });
+    };
 
-    await storedUser.save();
-    await customer.save();
-    await studio.save();
+    const customerUser = {
+      customer: {
+        name: "customer",
+        phone: "1234567890",
+      },
+      user: {
+        email: "customer@mail.com",
+        password: "123456",
+      },
+    };
 
-    body = { email: storedUser.email, password: storedUser.password };
+    await request(server).post("/api/customers").send(customerUser);
+    await request(server).post("/api/studios").send(studioUser);
+
+    customerBody = {
+      email: customerUser.user.email,
+      password: customerUser.user.password,
+    };
+
+    studioBody = {
+      email: studioUser.user.email,
+      password: studioUser.user.password,
+    };
   });
 
   it("should return 400 if the email is missing", async () => {
-    body.email = undefined;
-    const res = await sendRequest();
+    customerBody.email = undefined;
+    const res = await sendRequestAsCustomer();
 
     expect(res.status).toBe(400);
   });
 
   it("should return 400 if the password is missing", async () => {
-    body.password = undefined;
-    const res = await sendRequest();
+    customerBody.password = undefined;
+    const res = await sendRequestAsCustomer();
 
     expect(res.status).toBe(400);
   });
 
   it("should return 400 if the email is missing", async () => {
-    body.email = undefined;
-    const res = await sendRequest();
+    customerBody.email = undefined;
+    const res = await sendRequestAsCustomer();
 
     expect(res.status).toBe(400);
   });
 
   it("should return 404 if the email is incorrect", async () => {
-    body.email = "email2@mail.com";
-    const res = await sendRequest();
+    customerBody.email = "email2@mail.com";
+    const res = await sendRequestAsCustomer();
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
   });
 
   it("should return 404 if the password is incorrect", async () => {
-    body.email = "1234567";
-    const res = await sendRequest();
+    customerBody.email = "1234567";
+    const res = await sendRequestAsCustomer();
 
     expect(res.status).toBe(400);
   });
 
-  it("should return a valid token if the email and password are correct", async () => {
-    const res = await sendRequest();
-
-    expect(res.body).toHaveProperty("token");
-
-    const jwtSecretKey = config.get("jwtSecretKey");
-    expect(() => jwt.verify(res.body.token, jwtSecretKey)).not.toThrow();
+  it("should return 200 if the customer email and password are correct", async () => {
+    const res = await sendRequestAsCustomer();
 
     expect(res.status).toBe(200);
+  });
+
+  it("should return a valid token if the customer email and password are correct", async () => {
+    const res = await sendRequestAsCustomer();
+
+    expect(() => jwt.verify(res.body.token, jwtSecretKey)).not.toThrow();
+  });
+
+  it("should return 200 if the studio email and password are correct", async () => {
+    const res = await sendRequestAsStudio();
+
+    expect(res.status).toBe(200);
+  });
+
+  it("should return a valid token if the studio email and password are correct", async () => {
+    const res = await sendRequestAsStudio();
+
+    expect(() => jwt.verify(res.body.token, jwtSecretKey)).not.toThrow();
   });
 });
