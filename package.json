@@ -4,8 +4,9 @@
   "description": "rental-app-api",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll --verbose",
-    "dev": "nodemon src/index.js"
+    "test": "jest --watch --verbose",
+    "dev": "nodemon -L src/index.js",
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    environment:
+      MONGODB_URL: mongodb://db/rental
+    volumes:
+      - ./src:/app/src
+    command: ['npm', 'run', 'dev']
+  db:
+    image: mongo:4.4.13
+    ports:
+      - 27017:27017
+    volumes:
+      - rental:/data/db
+
+volumes:
+  rental:
