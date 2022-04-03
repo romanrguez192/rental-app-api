@@ -4,20 +4,19 @@ services:
   api:
     build: ./
     ports:
-      - 5000:5000
+      - 80:5000
     depends_on:
       - db
     environment:
       MONGODB_URL: mongodb://db/rental
-    volumes:
-      - ./src:/app/src
-    command: ['npx', 'nodemon', '-L', 'src/index.js']
+    restart: unless-stopped
   db:
     image: mongo:4.4.13
     ports:
       - 27017:27017
     volumes:
       - rental:/data/db
+    restart: unless-stopped
 
 volumes:
   rental:

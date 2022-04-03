@@ -12,4 +12,4 @@ EXPOSE 5000
 
 USER node
 
-CMD ["npm", "start"]
+CMD ["node", "src/index.js"]
